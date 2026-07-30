@@ -8,7 +8,7 @@ import { AppNav } from './AppNav';
 afterEach(cleanup);
 
 describe('AppNav', () => {
-  it('shows only Home, Quick and Plan', () => {
+  it('shows Home, Quick, Plan and Time off', () => {
     render(
       <MemoryRouter>
         <AppNav />
@@ -17,10 +17,12 @@ describe('AppNav', () => {
     const homeLinks = screen.getAllByRole('link', { name: 'Home' });
     const quickLinks = screen.getAllByRole('link', { name: 'Quick' });
     const planLinks = screen.getAllByRole('link', { name: 'Plan' });
+    const timeOffLinks = screen.getAllByRole('link', { name: 'Time off' });
     expect(homeLinks.length).toBeGreaterThan(0);
     expect(homeLinks[0]).toHaveAttribute('href', '/');
     expect(quickLinks[0]).toHaveAttribute('href', '/quick');
     expect(planLinks[0]).toHaveAttribute('href', '/plan');
+    expect(timeOffLinks[0]).toHaveAttribute('href', '/time-off');
     expect(screen.queryByRole('link', { name: /compare/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: /tracker/i })).not.toBeInTheDocument();
   });

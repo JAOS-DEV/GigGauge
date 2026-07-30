@@ -1,11 +1,12 @@
 import type { ReactElement } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Calculator, ClipboardList, Home } from 'lucide-react';
+import { Calculator, CalendarOff, ClipboardList, Home } from 'lucide-react';
 
 const links = [
   { to: '/', label: 'Home', icon: Home, end: true },
   { to: '/quick', label: 'Quick', icon: Calculator, end: false },
   { to: '/plan', label: 'Plan', icon: ClipboardList, end: false },
+  { to: '/time-off', label: 'Time off', icon: CalendarOff, end: false },
 ] as const;
 
 export function AppNav(): ReactElement {

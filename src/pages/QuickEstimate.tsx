@@ -1,14 +1,15 @@
 import { useEffect, useMemo, useRef, useState, type ReactElement } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowLeft, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Sparkles } from 'lucide-react';
 import type { GigGaugeScenario } from '../calculations/types';
 import { annualiseExpense } from '../calculations/expenses';
 import { QuickFormFields } from '../components/quick/QuickFormFields';
 import { ResultsPanel } from '../components/quick/ResultsPanel';
 import { createDefaultScenario } from '../state/defaultScenario';
 import { getQuickExample, parseQuickExampleId } from '../state/examples';
+import { prepareScenarioForDetailedPlan } from '../state/planHandoff';
 import type { StoredQuickForm } from '../state/persistence';
 import {
   computeQuickResults,
@@ -79,6 +80,7 @@ function buildInitialState(
 export function QuickEstimate(): ReactElement {
   const { scenario, quickForm, setActiveState } = useScenario();
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const [initial] = useState<InitialQuickState>(() =>
     buildInitialState(
@@ -156,6 +158,14 @@ export function QuickEstimate(): ReactElement {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watchedJson, setActiveState]);
 
+  const handleReviewDetailedAssumptions = (): void => {
+    const prepared = prepareScenarioForDetailedPlan(lastValidScenario.current, {
+      ...watched,
+    } as unknown as StoredQuickForm);
+    setActiveState(prepared.scenario, prepared.quickForm);
+    void navigate('/plan');
+  };
+
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-6 py-8">
       <nav>
@@ -185,6 +195,15 @@ export function QuickEstimate(): ReactElement {
       <form noValidate className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <QuickFormFields form={form} exampleCostsTotal={exampleCostsTotal} />
       </form>
+
+      <button
+        type="button"
+        onClick={handleReviewDetailedAssumptions}
+        className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-blue-800 bg-white px-4 text-base font-semibold text-blue-900 hover:bg-blue-50"
+      >
+        Review detailed assumptions
+        <ArrowRight aria-hidden="true" className="h-5 w-5" />
+      </button>
 
       <section aria-labelledby="results-heading" className="flex flex-col gap-4">
         <h2 id="results-heading" className="text-lg font-semibold text-blue-950">

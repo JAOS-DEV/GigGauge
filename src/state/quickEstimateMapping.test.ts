@@ -122,6 +122,27 @@ describe('quickFormToScenario', () => {
     const scenario = quickFormToScenario(gigValues, base);
     expect(scenario.work.paidHolidayDays).toBe(28);
   });
+
+  it('preserves Detailed-plan expenses that are not Quick-managed ids', () => {
+    const base = createDefaultScenario();
+    base.expenses = [
+      {
+        id: 'plan-custom-1',
+        name: 'Plan-added cost',
+        amount: 50,
+        frequency: 'weekly',
+        activeWorkingPeriodOnly: true,
+        businessUsePercentage: 100,
+        taxDeductible: true,
+        category: 'other',
+      },
+    ];
+    const scenario = quickFormToScenario(
+      makeValues({ ...gigValues, includeExampleCosts: false, mainCostAmount: '' }),
+      base,
+    );
+    expect(scenario.expenses).toEqual(base.expenses);
+  });
 });
 
 describe('computeQuickResults', () => {

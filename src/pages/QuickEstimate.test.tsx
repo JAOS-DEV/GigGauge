@@ -191,6 +191,13 @@ describe('QuickEstimate', () => {
     expect(screen.getByLabelText('Working weeks per year')).toHaveValue('30');
   });
 
+  it('offers a Review detailed assumptions handoff to Plan', () => {
+    renderQuick();
+    expect(
+      screen.getByRole('button', { name: /review detailed assumptions/i }),
+    ).toBeInTheDocument();
+  });
+
   it('persists the draft and restores every entered value after a remount', async () => {
     const user = userEvent.setup();
     const storage = makeMemoryStorage();

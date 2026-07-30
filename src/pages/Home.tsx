@@ -1,6 +1,6 @@
 import type { ReactElement } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Calculator, Gauge, Sparkles } from 'lucide-react';
+import { ArrowRight, Calculator, ClipboardList, Gauge, Sparkles } from 'lucide-react';
 import { getQuickExample } from '../state/examples';
 
 export function Home(): ReactElement {
@@ -28,6 +28,25 @@ export function Home(): ReactElement {
               <span className="block text-lg font-semibold text-blue-950">Quick estimate</span>
               <span className="block text-sm text-slate-500">
                 Find out what you need to earn to reach your take-home target.
+              </span>
+            </span>
+          </span>
+          <ArrowRight
+            aria-hidden="true"
+            className="h-5 w-5 shrink-0 text-slate-400 group-hover:text-blue-700"
+          />
+        </Link>
+
+        <Link
+          to="/plan"
+          className="group flex min-h-14 items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-colors hover:border-blue-700"
+        >
+          <span className="flex items-center gap-3">
+            <ClipboardList aria-hidden="true" className="h-6 w-6 text-blue-800" />
+            <span>
+              <span className="block text-lg font-semibold text-blue-950">Detailed plan</span>
+              <span className="block text-sm text-slate-500">
+                Edit every cost, income and leave assumption with a full breakdown.
               </span>
             </span>
           </span>

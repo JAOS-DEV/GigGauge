@@ -19,8 +19,11 @@ describe('Home', () => {
     expect(screen.getByRole('heading', { name: 'GigGauge' })).toBeInTheDocument();
     expect(screen.getByText('Know what your work is really worth.')).toBeInTheDocument();
 
-    const quickLink = screen.getByRole('link', { name: /quick estimate/i });
-    expect(quickLink).toHaveAttribute('href', '/quick?new=1');
+    expect(screen.getByRole('link', { name: /quick estimate/i })).toHaveAttribute(
+      'href',
+      '/quick?new=1',
+    );
+    expect(screen.getByRole('link', { name: /detailed plan/i })).toHaveAttribute('href', '/plan');
 
     expect(screen.getByRole('link', { name: /current employed job/i })).toHaveAttribute(
       'href',

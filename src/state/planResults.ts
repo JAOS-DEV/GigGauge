@@ -98,3 +98,18 @@ export function computePlanResults(scenario: GigGaugeScenario): PlanResults {
 
   return { kind: 'ok', scenarioResult, required };
 }
+
+/**
+ * Whether Home should show the results dashboard instead of the marketing empty state.
+ * True when goal status is assessable, a required solve exists (achievable or not),
+ * or the tax region is unsupported (so Scotland notices can surface on Home).
+ */
+export function shouldShowHomeDashboard(results: PlanResults): boolean {
+  if (results.kind === 'regionUnsupported') {
+    return true;
+  }
+  if (results.scenarioResult.goal.status !== 'insufficientData') {
+    return true;
+  }
+  return results.required !== null;
+}

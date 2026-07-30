@@ -4,9 +4,12 @@ import type { GigGaugeScenario } from '../../calculations/types';
 import { computePlanResults, type PlanResults } from '../../state/planResults';
 import { formatCurrencyGBP, formatPercent, formatWeeks } from '../../utils/format';
 import { StatusBanner } from '../quick/StatusBanner';
+import { GoalComparisonChart } from './GoalComparisonChart';
 
 interface PlanResultsPanelProps {
   scenario: GigGaugeScenario;
+  /** When true, show the goal-vs-achieved chart if goal status is assessable. */
+  showGoalChart?: boolean;
 }
 
 function Notice({ title, message }: { title: string; message: string }): ReactElement {
@@ -134,11 +137,16 @@ function Breakdown({
   );
 }
 
-export function PlanResultsPanel({ scenario }: PlanResultsPanelProps): ReactElement {
+export function PlanResultsPanel({
+  scenario,
+  showGoalChart = false,
+}: PlanResultsPanelProps): ReactElement {
   const results = computePlanResults(scenario);
+  const goalAssessable =
+    results.kind === 'ok' && results.scenarioResult.goal.status !== 'insufficientData';
 
   return (
-    <div aria-live="polite" className="flex flex-col gap-4">
+    <div aria-live="polite" className="flex flex-col gap-4" data-testid="plan-results-panel">
       {results.kind === 'regionUnsupported' ? (
         <Notice title="Scottish Income Tax isn't supported yet" message={results.reason} />
       ) : (
@@ -192,7 +200,7 @@ export function PlanResultsPanel({ scenario }: PlanResultsPanelProps): ReactElem
             </section>
           ) : null}
 
-          {results.scenarioResult.goal.status !== 'insufficientData' ? (
+          {goalAssessable ? (
             <StatusBanner
               summary={{
                 status: results.scenarioResult.goal.status,
@@ -205,6 +213,16 @@ export function PlanResultsPanel({ scenario }: PlanResultsPanelProps): ReactElem
               Enter a goal amount and enough income to see whether this plan meets your target.
             </p>
           )}
+
+          {showGoalChart && goalAssessable ? (
+            <GoalComparisonChart
+              goalAnnual={results.scenarioResult.goal.amount}
+              achievedAnnual={
+                results.scenarioResult.goal.amount + results.scenarioResult.goal.difference
+              }
+              goalType={scenario.goal.type}
+            />
+          ) : null}
 
           <Breakdown scenario={scenario} results={results} />
         </>

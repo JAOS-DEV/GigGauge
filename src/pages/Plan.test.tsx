@@ -52,6 +52,8 @@ describe('Plan', () => {
     expect(screen.getByText('Goal')).toBeInTheDocument();
     expect(screen.getByText('Work pattern')).toBeInTheDocument();
     expect(screen.getByText('Income')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'About Income' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'About Costs' })).toBeInTheDocument();
     expect(screen.getByText('Costs')).toBeInTheDocument();
     expect(screen.getByText('Tax')).toBeInTheDocument();
     expect(screen.getByText('Pension and retirement')).toBeInTheDocument();
@@ -70,7 +72,7 @@ describe('Plan', () => {
     const storage = makeMemoryStorage({ scenario: prepared.scenario });
     renderPlan(storage);
 
-    expect(await screen.findByText(/Vehicle rental/i)).toBeInTheDocument();
+    expect(await screen.findByDisplayValue(/Vehicle rental/i)).toBeInTheDocument();
     expect(screen.getAllByText(/Example — replace with your actual cost/).length).toBeGreaterThan(
       0,
     );

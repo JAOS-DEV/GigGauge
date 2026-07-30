@@ -5,7 +5,12 @@ import type {
   GoalType,
   WorkArrangementType,
 } from '../calculations/types';
-import { CheckboxField, SelectField, TextField } from '../components/FieldControls';
+import {
+  CheckboxField,
+  DraftNumberField,
+  SelectField,
+  TextField,
+} from '../components/FieldControls';
 import { CostEditor } from '../components/plan/CostEditor';
 import { PlanSection } from '../components/plan/PlanSection';
 import { PlanResultsPanel } from '../components/plan/PlanResultsPanel';
@@ -168,50 +173,46 @@ export function Plan(): ReactElement {
 
       <PlanSection id="work" title="Work pattern" defaultOpen>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <TextField
+          <DraftNumberField
             id="workingWeeks"
             label="Working weeks per year"
-            inputMode="numeric"
-            value={String(scenario.work.workingWeeksPerYear)}
-            onChange={(event) => {
-              const value = Number(event.target.value);
-              if (Number.isFinite(value) && value >= 1 && value <= 52) {
-                update({
-                  ...scenario,
-                  work: { ...scenario.work, workingWeeksPerYear: value },
-                });
-              }
-            }}
+            value={scenario.work.workingWeeksPerYear}
+            min={1}
+            max={52}
+            onCommit={(value) =>
+              update({
+                ...scenario,
+                work: { ...scenario.work, workingWeeksPerYear: value },
+              })
+            }
           />
-          <TextField
+          <DraftNumberField
             id="workingDays"
             label="Working days per week"
-            inputMode="numeric"
-            value={String(scenario.work.workingDaysPerWeek)}
-            onChange={(event) => {
-              const value = Number(event.target.value);
-              if (Number.isFinite(value) && value >= 1 && value <= 7) {
-                update({
-                  ...scenario,
-                  work: { ...scenario.work, workingDaysPerWeek: value },
-                });
-              }
-            }}
+            value={scenario.work.workingDaysPerWeek}
+            min={1}
+            max={7}
+            onCommit={(value) =>
+              update({
+                ...scenario,
+                work: { ...scenario.work, workingDaysPerWeek: value },
+              })
+            }
           />
-          <TextField
+          <DraftNumberField
             id="workingHours"
             label="Working hours per week"
-            inputMode="numeric"
-            value={String(scenario.work.workingHoursPerWeek)}
-            onChange={(event) => {
-              const value = Number(event.target.value);
-              if (Number.isFinite(value) && value > 0 && value <= 168) {
-                update({
-                  ...scenario,
-                  work: { ...scenario.work, workingHoursPerWeek: value },
-                });
-              }
-            }}
+            value={scenario.work.workingHoursPerWeek}
+            min={0.01}
+            max={168}
+            integer={false}
+            inputMode="decimal"
+            onCommit={(value) =>
+              update({
+                ...scenario,
+                work: { ...scenario.work, workingHoursPerWeek: value },
+              })
+            }
           />
         </div>
         <p className="text-sm text-slate-500">
@@ -220,7 +221,29 @@ export function Plan(): ReactElement {
         </p>
       </PlanSection>
 
-      <PlanSection id="income" title="Income" defaultOpen>
+      <PlanSection
+        id="income"
+        title="Income"
+        defaultOpen
+        help={
+          <>
+            <p>
+              Optional. Enter earnings for the job or gig in this scenario (what you earn now, or
+              expect to earn) so results can compare that income with your goal.
+            </p>
+            <p className="mt-2">
+              To see only what you need to earn, leave Income empty and use the required salary or
+              revenue figure above — that comes from your goal, work pattern and costs.
+            </p>
+            <p className="mt-2">
+              Use gross figures (before tax). Gross revenue is total billed or platform payouts
+              before business costs — not take-home. Optional payslip take-home replaces the tax
+              estimate when filled. The platform-fees tick is for your notes only and does not
+              change the maths; add fees as cost rows in Costs if you want them included.
+            </p>
+          </>
+        }
+      >
         {showEmploymentIncome ? (
           <div className="flex flex-col gap-3">
             <TextField
@@ -327,7 +350,24 @@ export function Plan(): ReactElement {
         ) : null}
       </PlanSection>
 
-      <PlanSection id="costs" title="Costs" defaultOpen>
+      <PlanSection
+        id="costs"
+        title="Costs"
+        defaultOpen
+        help={
+          <>
+            <p>
+              Work costs for this scenario (vehicle, fuel, platform fees, kit, and so on). Deductible
+              rows reduce taxable profit; all cash costs reduce take-home.
+            </p>
+            <p className="mt-2">
+              Add every work cost separately. Tick “Only paid during working weeks” on costs you can
+              pause when you take time off (for example vehicle rental), and leave it unticked for
+              year-round costs such as insurance.
+            </p>
+          </>
+        }
+      >
         <CostEditor
           expenses={scenario.expenses}
           workPattern={scenario.work}
@@ -381,7 +421,17 @@ export function Plan(): ReactElement {
         />
       </PlanSection>
 
-      <PlanSection id="pension" title="Pension and retirement">
+      <PlanSection
+        id="pension"
+        title="Pension and retirement"
+        help={
+          <p>
+            Self-employed retirement saving is treated as a post-tax allocation with no tax relief
+            modelled. Employee pension on the Income section uses the salary-sacrifice
+            simplification.
+          </p>
+        }
+      >
         {showEmploymentIncome ? (
           <>
             <TextField
@@ -431,49 +481,46 @@ export function Plan(): ReactElement {
             })
           }
         />
-        <p className="text-sm text-slate-500">
-          Self-employed retirement saving is treated as a post-tax allocation with no tax relief
-          modelled. Employee pension on the Income section uses the salary-sacrifice simplification.
-        </p>
       </PlanSection>
 
-      <PlanSection id="leave" title="Leave">
+      <PlanSection
+        id="leave"
+        title="Leave"
+        help={
+          <p>
+            Unpaid leave is mainly reflected by lowering working weeks in Work pattern. Paid leave is
+            one reason employed income differs from an equivalent self-employed weekly rate.
+          </p>
+        }
+      >
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <TextField
+          <DraftNumberField
             id="paidHoliday"
             label="Paid holiday days"
-            inputMode="numeric"
-            value={String(scenario.work.paidHolidayDays)}
-            onChange={(event) => {
-              const value = Number(event.target.value);
-              if (Number.isFinite(value) && value >= 0 && value <= 365) {
-                update({
-                  ...scenario,
-                  work: { ...scenario.work, paidHolidayDays: value },
-                });
-              }
-            }}
+            value={scenario.work.paidHolidayDays}
+            min={0}
+            max={365}
+            onCommit={(value) =>
+              update({
+                ...scenario,
+                work: { ...scenario.work, paidHolidayDays: value },
+              })
+            }
           />
-          <TextField
+          <DraftNumberField
             id="paidSick"
             label="Paid sick days"
-            inputMode="numeric"
-            value={String(scenario.work.paidSickDays)}
-            onChange={(event) => {
-              const value = Number(event.target.value);
-              if (Number.isFinite(value) && value >= 0 && value <= 365) {
-                update({
-                  ...scenario,
-                  work: { ...scenario.work, paidSickDays: value },
-                });
-              }
-            }}
+            value={scenario.work.paidSickDays}
+            min={0}
+            max={365}
+            onCommit={(value) =>
+              update({
+                ...scenario,
+                work: { ...scenario.work, paidSickDays: value },
+              })
+            }
           />
         </div>
-        <p className="text-sm text-slate-500">
-          Unpaid leave is mainly reflected by lowering working weeks in Work pattern. Paid leave is
-          one reason employed income differs from an equivalent self-employed weekly rate.
-        </p>
       </PlanSection>
 
       <PlanSection id="savings" title="Savings goals">

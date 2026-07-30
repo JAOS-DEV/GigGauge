@@ -4,7 +4,7 @@ import type { WorkExpense } from '../../calculations/types';
 import { annualiseExpense } from '../../calculations/expenses';
 import type { WorkPattern } from '../../calculations/types';
 import { formatCurrencyGBP } from '../../utils/format';
-import { CheckboxField, SelectField, TextField } from '../FieldControls';
+import { CheckboxField, DraftNumberField, SelectField, TextField } from '../FieldControls';
 import { createEmptyExpense, EXPENSE_CATEGORIES, isExampleExpense } from '../../state/planHandoff';
 import { EXAMPLE_COST_NOTE } from '../../state/quickEstimateMapping';
 
@@ -46,12 +46,6 @@ export function CostEditor({ expenses, workPattern, onChange }: CostEditorProps)
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-sm text-slate-500">
-        Add every work cost separately. Tick “Only paid during working weeks” on costs you can pause
-        when you take time off (for example vehicle rental), and leave it unticked for year-round
-        costs such as insurance.
-      </p>
-
       {expenses.length === 0 ? (
         <p className="text-base text-slate-500">No costs yet. Add your first cost below.</p>
       ) : null}
@@ -131,19 +125,15 @@ export function CostEditor({ expenses, workPattern, onChange }: CostEditorProps)
               </div>
 
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <TextField
+                <DraftNumberField
                   id={`${expense.id}-businessUse`}
                   label="Business use (%)"
-                  inputMode="numeric"
-                  value={String(expense.businessUsePercentage)}
-                  onChange={(event) => {
-                    const value = Number(event.target.value);
-                    if (Number.isFinite(value) && value >= 0 && value <= 100) {
-                      onChange(
-                        updateExpense(expenses, expense.id, { businessUsePercentage: value }),
-                      );
-                    }
-                  }}
+                  value={expense.businessUsePercentage}
+                  min={0}
+                  max={100}
+                  onCommit={(value) =>
+                    onChange(updateExpense(expenses, expense.id, { businessUsePercentage: value }))
+                  }
                 />
                 <SelectField
                   id={`${expense.id}-category`}

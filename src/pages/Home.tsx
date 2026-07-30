@@ -1,7 +1,8 @@
 import type { ReactElement } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Calculator, ClipboardList, Gauge, Sparkles } from 'lucide-react';
+import { ArrowRight, Calculator, ClipboardList, Gauge, RotateCcw, Sparkles } from 'lucide-react';
 import { PlanResultsPanel } from '../components/plan/PlanResultsPanel';
+import { createDefaultScenario } from '../state/defaultScenario';
 import { getQuickExample } from '../state/examples';
 import { computePlanResults, shouldShowHomeDashboard } from '../state/planResults';
 import { useScenario } from '../state/useScenario';
@@ -87,7 +88,17 @@ function MarketingHome(): ReactElement {
 }
 
 function ResultsDashboard(): ReactElement {
-  const { scenario } = useScenario();
+  const { scenario, setActiveState } = useScenario();
+
+  const handleStartOver = (): void => {
+    const confirmed = window.confirm(
+      'Clear your active plan and return to the welcome screen? This cannot be undone.',
+    );
+    if (!confirmed) {
+      return;
+    }
+    setActiveState(createDefaultScenario());
+  };
 
   return (
     <main
@@ -119,6 +130,14 @@ function ResultsDashboard(): ReactElement {
           <Calculator aria-hidden="true" className="h-5 w-5" />
           Quick estimate
         </Link>
+        <button
+          type="button"
+          onClick={handleStartOver}
+          className="inline-flex min-h-14 items-center justify-center gap-2 rounded-2xl px-5 text-base font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+        >
+          <RotateCcw aria-hidden="true" className="h-5 w-5" />
+          Start over
+        </button>
       </section>
     </main>
   );

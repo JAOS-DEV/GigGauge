@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createDefaultScenario } from './defaultScenario';
-import { computePlanResults } from './planResults';
+import { computePlanResults, shouldShowHomeDashboard } from './planResults';
 import { annualiseExpense } from '../calculations/expenses';
 
 describe('computePlanResults', () => {
@@ -66,5 +66,31 @@ describe('computePlanResults', () => {
     if (results.kind === 'ok' && results.required?.achievable) {
       expect(results.required.kind).toBe('grossSalary');
     }
+  });
+});
+
+describe('shouldShowHomeDashboard', () => {
+  it('is false for a fresh default draft', () => {
+    const results = computePlanResults(createDefaultScenario());
+    expect(shouldShowHomeDashboard(results)).toBe(false);
+  });
+
+  it('is true when a required solve exists without income', () => {
+    const scenario = createDefaultScenario();
+    scenario.goal.amount = 30_000;
+    expect(shouldShowHomeDashboard(computePlanResults(scenario))).toBe(true);
+  });
+
+  it('is true when goal status is assessable', () => {
+    const scenario = createDefaultScenario();
+    scenario.goal.amount = 30_000;
+    scenario.income.grossRevenue = 50_000;
+    expect(shouldShowHomeDashboard(computePlanResults(scenario))).toBe(true);
+  });
+
+  it('is true for Scotland unsupported results', () => {
+    const scenario = createDefaultScenario();
+    scenario.tax.region = 'scotland';
+    expect(shouldShowHomeDashboard(computePlanResults(scenario))).toBe(true);
   });
 });

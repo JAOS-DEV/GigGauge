@@ -1,12 +1,13 @@
 import type { ReactElement } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Calculator, CalendarOff, ClipboardList, Home } from 'lucide-react';
+import { Calculator, CalendarOff, ClipboardList, FolderOpen, Home } from 'lucide-react';
 
 const links = [
   { to: '/', label: 'Home', icon: Home, end: true },
   { to: '/quick', label: 'Quick', icon: Calculator, end: false },
   { to: '/plan', label: 'Plan', icon: ClipboardList, end: false },
   { to: '/time-off', label: 'Time off', icon: CalendarOff, end: false },
+  { to: '/scenarios', label: 'Scenarios', icon: FolderOpen, end: false },
 ] as const;
 
 export function AppNav(): ReactElement {
@@ -50,7 +51,7 @@ export function AppNav(): ReactElement {
               end={end}
               className={({ isActive }) =>
                 [
-                  'flex min-h-14 min-w-[4.5rem] flex-1 flex-col items-center justify-center gap-0.5 px-3 text-sm font-medium',
+                  'flex min-h-14 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 px-1 text-xs font-medium',
                   isActive ? 'text-blue-900' : 'text-slate-500 hover:text-blue-800',
                 ].join(' ')
               }

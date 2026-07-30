@@ -5,6 +5,7 @@ import { App } from './App';
 import { Home } from './pages/Home';
 import { Plan } from './pages/Plan';
 import { QuickEstimate } from './pages/QuickEstimate';
+import { Scenarios } from './pages/Scenarios';
 import { TimeOff } from './pages/TimeOff';
 import { ScenarioProvider } from './state/scenarioContext';
 import './index.css';
@@ -18,6 +19,7 @@ const router = createBrowserRouter([
       { path: 'quick', element: <QuickEstimate /> },
       { path: 'plan', element: <Plan /> },
       { path: 'time-off', element: <TimeOff /> },
+      { path: 'scenarios', element: <Scenarios /> },
     ],
   },
 ]);

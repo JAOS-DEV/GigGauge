@@ -1,0 +1,9 @@
+dist
+coverage
+node_modules
+package-lock.json
+
+# AI-loop workflow files — do not reformat
+AI_LOOP.md
+docs/ai-loop/
+.cursor/

@@ -12,13 +12,9 @@ Last refreshed: 2026-07-30 by `/ai-bootstrap`.
 
 ## Repository status — IMPORTANT
 
-This is a **greenfield repository with no code yet**. As of this bootstrap:
+The project was scaffolded by issue #1 (Vite + React + TypeScript strict, npm). The commands in the table below are confirmed and must be run for any change. There are still **no CI workflows** — missing CI must not be treated as passing CI.
 
-- There are **no commits**, no package manifest, no lockfile, no source files and no CI workflows.
-- Local branch: `main`. Remote: `origin → https://github.com/JAOS-DEV/GigGauge.git` (remote repository exists but is empty).
-- **No lint, type-check, test or build commands exist yet.** Agents must not claim any automated check passed until the project has been scaffolded and the command genuinely exists in `package.json`.
-
-The first approved issue is expected to scaffold the project. Once scaffolding lands, **update this file** so the commands below move from "planned" to "confirmed".
+- Local branch: `main`. Remote: `origin → https://github.com/JAOS-DEV/GigGauge.git`.
 
 ## Technology stack (planned, per approved product brief)
 
@@ -45,16 +41,14 @@ The first approved issue is expected to scaffold the project. Once scaffolding l
 
 ## Commands
 
-None of these exist yet. They are the **expected** commands once the Vite scaffold is in place. Before running any of them, verify they exist in `package.json`.
-
-| Task | Expected command | Status |
-| --- | --- | --- |
-| Install dependencies | `npm install` | Not yet configured |
-| Local development | `npm run dev` (Vite, expected at `http://localhost:5173`) | Not yet configured |
-| Lint | `npm run lint` (ESLint) | Not yet configured |
-| Type-check | `npm run typecheck` (`tsc --noEmit`) or as defined in `package.json` | Not yet configured |
-| Automated tests | `npm run test` (Vitest) | Not yet configured |
-| Production build | `npm run build` (Vite) | Not yet configured |
+| Task                 | Command                                       | Status    |
+| -------------------- | --------------------------------------------- | --------- |
+| Install dependencies | `npm install`                                 | Confirmed |
+| Local development    | `npm run dev` (Vite, `http://localhost:5173`) | Confirmed |
+| Lint                 | `npm run lint` (ESLint)                       | Confirmed |
+| Type-check           | `npm run typecheck` (`tsc -b`)                | Confirmed |
+| Automated tests      | `npm run test` (Vitest)                       | Confirmed |
+| Production build     | `npm run build` (`tsc -b && vite build`)      | Confirmed |
 
 ## CI checks
 
@@ -108,7 +102,7 @@ Once features exist, verify these journeys in a browser:
 
 ## Checks that are unavailable or not configured
 
-- Lint, type-check, tests, build: not configured yet (no scaffold).
+- Lint, type-check, tests, build: configured (see Commands above).
 - CI: none.
 - Deployment previews: not connected.
 

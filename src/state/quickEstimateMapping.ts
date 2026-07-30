@@ -172,7 +172,12 @@ export function quickFormToScenario(
   };
   const isEmployed = values.arrangementType === 'employed';
 
-  const expenses: WorkExpense[] = [];
+  // Preserve expenses added or edited on the Detailed plan so Quick↔Plan
+  // trips do not wipe Plan-owned rows. Only rebuild the Quick-managed ids.
+  const expenses: WorkExpense[] = base.expenses.filter(
+    (expense) =>
+      expense.id !== QUICK_MAIN_COST_ID && !expense.id.startsWith(EXAMPLE_COST_ID_PREFIX),
+  );
   const mainCostAmount = values.mainCostAmount.trim() === '' ? 0 : toNumber(values.mainCostAmount);
   if (mainCostAmount > 0) {
     expenses.push({

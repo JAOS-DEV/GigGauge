@@ -59,6 +59,7 @@ describe('Scenarios page', () => {
 
   it('saves the active plan into the library and lists it after reload from storage', async () => {
     const user = userEvent.setup();
+    const promptSpy = vi.spyOn(window, 'prompt').mockReturnValue('Private hire saved');
     const scenario = createDefaultScenario();
     scenario.name = 'Private hire';
     scenario.goal.amount = 30_000;
@@ -66,13 +67,29 @@ describe('Scenarios page', () => {
     renderScenarios(storage);
 
     await user.click(screen.getByRole('button', { name: /save current plan/i }));
+    expect(promptSpy).toHaveBeenCalledWith('Name for this saved scenario', 'Private hire');
     expect(screen.getByTestId('scenarios-list')).toBeInTheDocument();
-    expect(screen.getByText('Private hire')).toBeInTheDocument();
+    expect(screen.getByText('Private hire saved')).toBeInTheDocument();
     expect(storage.data.get(SAVED_SCENARIOS_KEY)).toBeTruthy();
 
     cleanup();
     renderScenarios(storage);
-    expect(screen.getByText('Private hire')).toBeInTheDocument();
+    expect(screen.getByText('Private hire saved')).toBeInTheDocument();
+    promptSpy.mockRestore();
+  });
+
+  it('does not save when the name prompt is cancelled', async () => {
+    const user = userEvent.setup();
+    const promptSpy = vi.spyOn(window, 'prompt').mockReturnValue(null);
+    const scenario = createDefaultScenario();
+    scenario.name = 'Private hire';
+    const storage = makeMemoryStorage({ scenario });
+    renderScenarios(storage);
+
+    await user.click(screen.getByRole('button', { name: /save current plan/i }));
+    expect(screen.getByTestId('scenarios-empty')).toBeInTheDocument();
+    expect(storage.data.get(SAVED_SCENARIOS_KEY)).toBeUndefined();
+    promptSpy.mockRestore();
   });
 
   it('loads a saved scenario into the active draft after confirm', async () => {

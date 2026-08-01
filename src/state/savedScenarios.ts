@@ -153,18 +153,32 @@ export type SaveToLibraryResult =
   | { ok: true; entry: SavedScenarioEntry; entries: SavedScenarioEntry[] }
   | { ok: false; reason: 'full' | 'notFound'; entries: SavedScenarioEntry[] };
 
+/** Resolve the display name for a new library entry (active draft name unchanged). */
+export function resolveLibrarySaveName(
+  scenarioName: string,
+  libraryName?: string,
+): string {
+  const fromPrompt = libraryName?.trim();
+  if (fromPrompt) {
+    return fromPrompt;
+  }
+  const fromScenario = scenarioName.trim();
+  return fromScenario === '' ? 'Saved plan' : fromScenario;
+}
+
 /** Copy the active draft into the library (active draft unchanged). */
 export function saveActiveDraftToLibrary(
   storage: KeyValueStorage,
   scenario: GigGaugeScenario,
   quickForm?: StoredQuickForm,
+  libraryName?: string,
 ): SaveToLibraryResult {
   const entries = loadSavedScenarios(storage);
   if (entries.length >= SAVED_SCENARIOS_SOFT_CAP) {
     return { ok: false, reason: 'full', entries };
   }
 
-  const name = scenario.name.trim() === '' ? 'Saved plan' : scenario.name.trim();
+  const name = resolveLibrarySaveName(scenario.name, libraryName);
   const cloned = deepCloneScenario(scenario);
   cloned.id = newId('scenario');
   cloned.name = name;

@@ -81,7 +81,12 @@ export function Scenarios({ storage: storageProp }: ScenariosProps): ReactElemen
       setError('Saving is unavailable in this browser (storage blocked).');
       return;
     }
-    const result = saveActiveDraftToLibrary(storage, scenario, quickForm);
+    const defaultName = scenario.name.trim() === '' ? 'Saved plan' : scenario.name.trim();
+    const chosenName = window.prompt('Name for this saved scenario', defaultName);
+    if (chosenName === null) {
+      return;
+    }
+    const result = saveActiveDraftToLibrary(storage, scenario, quickForm, chosenName);
     if (!result.ok) {
       setError(
         `You already have ${SAVED_SCENARIOS_SOFT_CAP} saved scenarios. Delete or export some before saving another.`,

@@ -45,6 +45,19 @@ describe('savedScenarios', () => {
     const loaded = loadSavedScenarios(storage);
     expect(loaded).toHaveLength(1);
     expect(loaded[0]?.scenario.name).toBe('Gig plan');
+    expect(scenario.name).toBe('Gig plan');
+  });
+
+  it('uses an explicit library name without changing the active draft name', () => {
+    const storage = makeMemoryStorage();
+    const scenario = createDefaultScenario();
+    scenario.name = 'Quick estimate';
+
+    const result = saveActiveDraftToLibrary(storage, scenario, undefined, ' Summer gig ');
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.entry.scenario.name).toBe('Summer gig');
+    expect(scenario.name).toBe('Quick estimate');
   });
 
   it('renames, duplicates and deletes entries', () => {

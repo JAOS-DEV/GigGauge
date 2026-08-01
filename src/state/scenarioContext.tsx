@@ -88,9 +88,10 @@ export function ScenarioProvider({ children, storage }: ScenarioProviderProps): 
     () => ({
       scenario: state.scenario,
       quickForm: state.quickForm,
+      storage: resolvedStorage,
       setActiveState,
     }),
-    [state, setActiveState],
+    [state, resolvedStorage, setActiveState],
   );
 
   return <ScenarioContext.Provider value={value}>{children}</ScenarioContext.Provider>;

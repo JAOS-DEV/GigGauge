@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/vitest';
@@ -11,6 +11,7 @@ import { getQuickExample } from '../state/examples';
 import { prepareScenarioForDetailedPlan } from '../state/planHandoff';
 import { quickFormToScenario } from '../state/quickEstimateMapping';
 import { ACTIVE_SCENARIO_KEY, saveActiveState, type KeyValueStorage } from '../state/persistence';
+import { SAVED_SCENARIOS_KEY } from '../state/savedScenarios';
 
 function makeMemoryStorage(seed?: {
   scenario: ReturnType<typeof createDefaultScenario>;
@@ -157,5 +158,20 @@ describe('Plan', () => {
     first.unmount();
     renderPlan(storage);
     expect(screen.getAllByRole('button', { name: /delete cost/i }).length).toBe(before - 1);
+  });
+
+  it('saves the active plan to the library from the Plan page', async () => {
+    const user = userEvent.setup();
+    const promptSpy = vi.spyOn(window, 'prompt').mockReturnValue('Plan snapshot');
+    const scenario = createDefaultScenario();
+    scenario.name = 'Detailed draft';
+    const storage = makeMemoryStorage({ scenario });
+    renderPlan(storage);
+
+    await user.click(screen.getByRole('button', { name: /save current plan/i }));
+    expect(promptSpy).toHaveBeenCalledWith('Name for this saved scenario', 'Detailed draft');
+    expect(screen.getByRole('status')).toHaveTextContent('Plan snapshot');
+    expect(storage.data.get(SAVED_SCENARIOS_KEY)).toBeTruthy();
+    promptSpy.mockRestore();
   });
 });

@@ -11,6 +11,7 @@ import {
   SelectField,
   TextField,
 } from '../components/FieldControls';
+import { SaveToLibraryButton } from '../components/SaveToLibraryButton';
 import { CostEditor } from '../components/plan/CostEditor';
 import { PlanSection } from '../components/plan/PlanSection';
 import { PlanResultsPanel } from '../components/plan/PlanResultsPanel';
@@ -98,6 +99,7 @@ export function Plan(): ReactElement {
           Results
         </h2>
         <PlanResultsPanel scenario={scenario} />
+        <SaveToLibraryButton />
       </section>
 
       <PlanSection id="goal" title="Goal" defaultOpen>

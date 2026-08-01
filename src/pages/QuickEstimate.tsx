@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeft, ArrowRight, Sparkles } from 'lucide-react';
 import type { GigGaugeScenario } from '../calculations/types';
 import { annualiseExpense } from '../calculations/expenses';
+import { SaveToLibraryButton } from '../components/SaveToLibraryButton';
 import { QuickFormFields } from '../components/quick/QuickFormFields';
 import { ResultsPanel } from '../components/quick/ResultsPanel';
 import { createDefaultScenario } from '../state/defaultScenario';
@@ -210,6 +211,7 @@ export function QuickEstimate(): ReactElement {
           Your estimate
         </h2>
         <ResultsPanel results={displayResults} />
+        <SaveToLibraryButton />
       </section>
     </main>
   );

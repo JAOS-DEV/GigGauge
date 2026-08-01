@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+// @vitest-environment jsdom
+import { describe, expect, it, vi } from 'vitest';
 import { createDefaultScenario } from './defaultScenario';
 import type { KeyValueStorage } from './persistence';
 import {
@@ -8,6 +9,7 @@ import {
   loadSavedScenarios,
   materialiseSavedEntryForLoad,
   mergeImportedSavedScenarios,
+  promptAndSaveActiveDraftToLibrary,
   renameSavedScenario,
   saveActiveDraftToLibrary,
   SAVED_SCENARIOS_SOFT_CAP,
@@ -58,6 +60,16 @@ describe('savedScenarios', () => {
     if (!result.ok) return;
     expect(result.entry.scenario.name).toBe('Summer gig');
     expect(scenario.name).toBe('Quick estimate');
+  });
+
+  it('promptAndSaveActiveDraftToLibrary cancels without writing', () => {
+    const promptSpy = vi.spyOn(window, 'prompt').mockReturnValue(null);
+    const storage = makeMemoryStorage();
+    const scenario = createDefaultScenario();
+    const result = promptAndSaveActiveDraftToLibrary(storage, scenario);
+    expect(result.status).toBe('cancelled');
+    expect(loadSavedScenarios(storage)).toHaveLength(0);
+    promptSpy.mockRestore();
   });
 
   it('renames, duplicates and deletes entries', () => {

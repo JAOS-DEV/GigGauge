@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/vitest';
@@ -8,6 +8,7 @@ import type { ReactElement } from 'react';
 import { QuickEstimate } from './QuickEstimate';
 import { ScenarioProvider } from '../state/scenarioContext';
 import { ACTIVE_SCENARIO_KEY, type KeyValueStorage } from '../state/persistence';
+import { SAVED_SCENARIOS_KEY } from '../state/savedScenarios';
 
 function makeMemoryStorage(): KeyValueStorage & { data: Map<string, string> } {
   const data = new Map<string, string>();
@@ -196,6 +197,19 @@ describe('QuickEstimate', () => {
     expect(
       screen.getByRole('button', { name: /review detailed assumptions/i }),
     ).toBeInTheDocument();
+  });
+
+  it('saves the active plan to the library from Quick estimate', async () => {
+    const user = userEvent.setup();
+    const promptSpy = vi.spyOn(window, 'prompt').mockReturnValue('Quick snapshot');
+    const storage = makeMemoryStorage();
+    renderQuick('/quick', storage);
+
+    await user.click(screen.getByRole('button', { name: /save current plan/i }));
+    expect(promptSpy).toHaveBeenCalled();
+    expect(screen.getByRole('status')).toHaveTextContent('Quick snapshot');
+    expect(storage.data.get(SAVED_SCENARIOS_KEY)).toBeTruthy();
+    promptSpy.mockRestore();
   });
 
   it('persists the draft and restores every entered value after a remount', async () => {

@@ -166,6 +166,36 @@ export function resolveLibrarySaveName(
   return fromScenario === '' ? 'Saved plan' : fromScenario;
 }
 
+export type PromptedSaveToLibraryResult =
+  | { status: 'cancelled' }
+  | { status: 'unavailable' }
+  | { status: 'full'; entries: SavedScenarioEntry[] }
+  | { status: 'saved'; entry: SavedScenarioEntry; entries: SavedScenarioEntry[] };
+
+/**
+ * Prompt for a library name, then copy the active draft into the library.
+ * Cancel leaves the library unchanged. Does not mutate the active draft.
+ */
+export function promptAndSaveActiveDraftToLibrary(
+  storage: KeyValueStorage | null,
+  scenario: GigGaugeScenario,
+  quickForm?: StoredQuickForm,
+): PromptedSaveToLibraryResult {
+  if (!storage) {
+    return { status: 'unavailable' };
+  }
+  const defaultName = resolveLibrarySaveName(scenario.name);
+  const chosenName = window.prompt('Name for this saved scenario', defaultName);
+  if (chosenName === null) {
+    return { status: 'cancelled' };
+  }
+  const result = saveActiveDraftToLibrary(storage, scenario, quickForm, chosenName);
+  if (!result.ok) {
+    return { status: 'full', entries: result.entries };
+  }
+  return { status: 'saved', entry: result.entry, entries: result.entries };
+}
+
 /** Copy the active draft into the library (active draft unchanged). */
 export function saveActiveDraftToLibrary(
   storage: KeyValueStorage,

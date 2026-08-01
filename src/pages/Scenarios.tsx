@@ -17,8 +17,8 @@ import {
   loadSavedScenarios,
   materialiseSavedEntryForLoad,
   mergeImportedSavedScenarios,
+  promptAndSaveActiveDraftToLibrary,
   renameSavedScenario,
-  saveActiveDraftToLibrary,
   SAVED_SCENARIOS_SOFT_CAP,
   type SavedScenarioEntry,
 } from '../state/savedScenarios';
@@ -77,17 +77,15 @@ export function Scenarios({ storage: storageProp }: ScenariosProps): ReactElemen
 
   const handleSave = (): void => {
     setError(null);
-    if (!storage) {
+    const result = promptAndSaveActiveDraftToLibrary(storage, scenario, quickForm);
+    if (result.status === 'cancelled') {
+      return;
+    }
+    if (result.status === 'unavailable') {
       setError('Saving is unavailable in this browser (storage blocked).');
       return;
     }
-    const defaultName = scenario.name.trim() === '' ? 'Saved plan' : scenario.name.trim();
-    const chosenName = window.prompt('Name for this saved scenario', defaultName);
-    if (chosenName === null) {
-      return;
-    }
-    const result = saveActiveDraftToLibrary(storage, scenario, quickForm, chosenName);
-    if (!result.ok) {
+    if (result.status === 'full') {
       setError(
         `You already have ${SAVED_SCENARIOS_SOFT_CAP} saved scenarios. Delete or export some before saving another.`,
       );

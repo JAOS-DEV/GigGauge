@@ -65,7 +65,107 @@ describe('computePlanResults', () => {
     expect(results.kind).toBe('ok');
     if (results.kind === 'ok' && results.required?.achievable) {
       expect(results.required.kind).toBe('grossSalary');
+      expect(results.projectedFromRequired).toBe(false);
     }
+  });
+
+  it('projects tax breakdown from required revenue when income is empty', () => {
+    const scenario = createDefaultScenario();
+    scenario.arrangementType = 'selfEmployed';
+    scenario.goal = { type: 'takeHome', period: 'annual', amount: 40_000 };
+    scenario.work = {
+      workingWeeksPerYear: 48,
+      workingDaysPerWeek: 5,
+      workingHoursPerWeek: 40,
+      paidHolidayDays: 0,
+      paidSickDays: 0,
+    };
+    scenario.expenses = [
+      {
+        id: '1',
+        name: 'Car',
+        amount: 250,
+        frequency: 'weekly',
+        activeWorkingPeriodOnly: true,
+        businessUsePercentage: 100,
+        taxDeductible: true,
+        category: 'vehicle',
+      },
+      {
+        id: '2',
+        name: 'Charging',
+        amount: 70,
+        frequency: 'weekly',
+        activeWorkingPeriodOnly: true,
+        businessUsePercentage: 100,
+        taxDeductible: true,
+        category: 'vehicle',
+      },
+      {
+        id: '3',
+        name: 'Phone',
+        amount: 240,
+        frequency: 'annual',
+        activeWorkingPeriodOnly: false,
+        businessUsePercentage: 100,
+        taxDeductible: true,
+        category: 'comms',
+      },
+      {
+        id: '4',
+        name: 'Accountant',
+        amount: 300,
+        frequency: 'annual',
+        activeWorkingPeriodOnly: false,
+        businessUsePercentage: 100,
+        taxDeductible: true,
+        category: 'admin',
+      },
+      {
+        id: '5',
+        name: 'Licensing',
+        amount: 100,
+        frequency: 'annual',
+        activeWorkingPeriodOnly: false,
+        businessUsePercentage: 100,
+        taxDeductible: true,
+        category: 'admin',
+      },
+      {
+        id: '6',
+        name: 'Other',
+        amount: 300,
+        frequency: 'annual',
+        activeWorkingPeriodOnly: false,
+        businessUsePercentage: 100,
+        taxDeductible: true,
+        category: 'other',
+      },
+    ];
+
+    const results = computePlanResults(scenario);
+    expect(results.kind).toBe('ok');
+    if (results.kind !== 'ok' || !results.required?.achievable) {
+      throw new Error('expected achievable required revenue');
+    }
+    expect(results.projectedFromRequired).toBe(true);
+    expect(results.required.annualAmount).toBeCloseTo(65_937.57, 0);
+    expect(results.scenarioResult.annualRevenue).toBeCloseTo(results.required.annualAmount, 2);
+    expect(results.scenarioResult.tax.incomeTax).toBeGreaterThan(0);
+    expect(results.scenarioResult.tax.nationalInsurance).toBeGreaterThan(0);
+    expect(results.scenarioResult.takeHome).toBeCloseTo(40_000, 0);
+    expect(results.scenarioResult.goal.status).not.toBe('insufficientData');
+  });
+
+  it('does not project when the user has entered income', () => {
+    const scenario = createDefaultScenario();
+    scenario.goal = { type: 'takeHome', period: 'annual', amount: 40_000 };
+    scenario.income = { grossRevenue: 20_000 };
+    const results = computePlanResults(scenario);
+    expect(results.kind).toBe('ok');
+    if (results.kind !== 'ok') return;
+    expect(results.projectedFromRequired).toBe(false);
+    expect(results.scenarioResult.annualRevenue).toBe(20_000);
   });
 });
 

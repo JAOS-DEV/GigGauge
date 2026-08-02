@@ -82,18 +82,17 @@ describe('Home', () => {
     expect(screen.queryByText('Know what your work is really worth.')).not.toBeInTheDocument();
   });
 
-  it('shows required cards without a fake achieved banner when income is missing', () => {
+  it('projects tax breakdown from required revenue when income is missing', () => {
     const scenario = createDefaultScenario();
     scenario.goal = { type: 'takeHome', period: 'annual', amount: 30_000 };
     renderHome(makeMemoryStorage({ scenario }));
 
     expect(screen.getByTestId('home-results-dashboard')).toBeInTheDocument();
     expect(screen.getByText(/Required annual revenue/i)).toBeInTheDocument();
-    expect(screen.queryByTestId('status-banner')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('goal-comparison-chart')).not.toBeInTheDocument();
-    expect(
-      screen.getByText(/Enter a goal amount and enough income/i),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId('status-banner')).toBeInTheDocument();
+    expect(screen.getByTestId('breakdown-projected-note')).toBeInTheDocument();
+    expect(screen.getByTestId('financial-breakdown')).toBeInTheDocument();
+    expect(screen.getByText('− Income Tax')).toBeInTheDocument();
   });
 
   it('shows the Scotland unsupported notice on the dashboard', () => {

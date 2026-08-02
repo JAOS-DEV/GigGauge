@@ -4,16 +4,24 @@
 
 GigGauge is a mobile-first financial planning web application that helps you calculate how much you need to earn to reach a personal income target, and compare employed, self-employed, contracting and gig-work arrangements on a like-for-like basis — after expenses, tax and time off.
 
-## Status
+## Features
 
-Early development. This release contains the project scaffold and the pure calculation engine (period conversions, expense annualisation, the UK 2026/27 tax engine and reverse target solvers) with full unit-test coverage. The user-facing calculator flows arrive in subsequent releases.
+- **Quick estimate** and **Detailed plan** — set a target, enter work pattern, income and costs, see take-home estimates and required earnings.
+- **Home results dashboard** — goal status, breakdown and chart for the active plan.
+- **Time off** — what-if working weeks and apply a pattern to the active plan.
+- **Scenarios** — save, load, rename, duplicate, delete, export and import named plans (local library).
+- **Compare** — side-by-side comparison of two or three saved plans.
+- **Tracker** — log cash actually received (separate from plan maths); week / month / year totals.
+- **About** — how estimates work, tax disclaimer and limitations.
+- **PWA** — installable app with an offline app shell (see below).
 
 ## Tech stack
 
 - React + TypeScript (strict mode) + Vite
 - React Router, Tailwind CSS, Lucide React, Recharts, React Hook Form, Zod
 - Vitest, ESLint, Prettier
-- localStorage persistence (planned) — no backend, works anonymously
+- localStorage persistence — no backend, works anonymously
+- Progressive Web App via `vite-plugin-pwa` (Workbox)
 
 ## Getting started
 
@@ -51,12 +59,24 @@ src/calculations/
   expenses.ts        Expense annualisation and summaries
   income.ts          Profit/loss and income attribution
   scenarioResult.ts  Full scenario result orchestration
+  comparisons.ts     Side-by-side comparison metrics
   targets/           Reverse solvers (required gross salary / revenue)
   tax/               UK tax engine; all rates live in tax/config/
 src/utils/format.ts  GBP/en-GB display formatters
 ```
 
 All tax rates and thresholds live only in `src/calculations/tax/config/` per tax year and region. Full precision is retained internally; rounding happens only in display formatters.
+
+Active draft, saved scenarios library and earnings tracker each use versioned localStorage envelopes so future migrations can run without silently discarding data.
+
+## Progressive Web App
+
+Production builds (`npm run build`) emit a web app manifest and service worker.
+
+- **Install:** use the browser’s install / “Add to Home Screen” control where supported (Chrome, Edge, Safari on supported devices).
+- **Offline:** after you have opened the app online once, the cached app shell (HTML/JS/CSS) loads offline. Client-side calculations and localStorage continue to work. There is no background sync or push.
+- **Updates:** the service worker uses an auto-update strategy. If a deploy looks stuck on an old shell, hard-refresh or clear the site’s service worker.
+- **Preview locally:** `npm run build && npm run preview`, then open the preview URL (service workers are not enabled in `npm run dev`).
 
 ## Tax estimates — important
 
@@ -71,6 +91,8 @@ Not supported or simplified:
 - Employee pension contributions are modelled as **salary sacrifice** (deducted before Income Tax and NI).
 - Self-employed retirement saving is treated as a post-tax allocation with no tax relief.
 - Class 2 NI (voluntary from 2026/27) and the Class 1/Class 4 annual-maximum rule are excluded.
+
+See also the in-app **About** page (`/about`).
 
 ## Deployment
 

@@ -8,24 +8,31 @@ import { AppNav } from './AppNav';
 afterEach(cleanup);
 
 describe('AppNav', () => {
-  it('shows Home, Quick, Plan, Time off and Scenarios', () => {
+  it('shows seven primary items including Compare and Tracker, but not About', () => {
     render(
       <MemoryRouter>
         <AppNav />
       </MemoryRouter>,
     );
-    const homeLinks = screen.getAllByRole('link', { name: 'Home' });
-    const quickLinks = screen.getAllByRole('link', { name: 'Quick' });
-    const planLinks = screen.getAllByRole('link', { name: 'Plan' });
-    const timeOffLinks = screen.getAllByRole('link', { name: 'Time off' });
-    const scenariosLinks = screen.getAllByRole('link', { name: 'Scenarios' });
-    expect(homeLinks.length).toBeGreaterThan(0);
-    expect(homeLinks[0]).toHaveAttribute('href', '/');
-    expect(quickLinks[0]).toHaveAttribute('href', '/quick');
-    expect(planLinks[0]).toHaveAttribute('href', '/plan');
-    expect(timeOffLinks[0]).toHaveAttribute('href', '/time-off');
-    expect(scenariosLinks[0]).toHaveAttribute('href', '/scenarios');
-    expect(screen.queryByRole('link', { name: /compare/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: /tracker/i })).not.toBeInTheDocument();
+    expect(screen.getAllByRole('link', { name: 'Home' })[0]).toHaveAttribute('href', '/');
+    expect(screen.getAllByRole('link', { name: 'Quick' })[0]).toHaveAttribute('href', '/quick');
+    expect(screen.getAllByRole('link', { name: 'Plan' })[0]).toHaveAttribute('href', '/plan');
+    expect(screen.getAllByRole('link', { name: 'Time off' })[0]).toHaveAttribute(
+      'href',
+      '/time-off',
+    );
+    expect(screen.getAllByRole('link', { name: 'Scenarios' })[0]).toHaveAttribute(
+      'href',
+      '/scenarios',
+    );
+    expect(screen.getAllByRole('link', { name: 'Compare' })[0]).toHaveAttribute(
+      'href',
+      '/compare',
+    );
+    expect(screen.getAllByRole('link', { name: 'Tracker' })[0]).toHaveAttribute(
+      'href',
+      '/tracker',
+    );
+    expect(screen.queryByRole('link', { name: /^about$/i })).not.toBeInTheDocument();
   });
 });

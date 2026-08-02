@@ -60,6 +60,12 @@ function MarketingHome(): ReactElement {
           />
         </Link>
 
+        <p className="text-center text-sm text-slate-500">
+          <Link to="/about" className="font-medium text-blue-800 underline-offset-2 hover:underline">
+            About estimates and limitations
+          </Link>
+        </p>
+
         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <h2 className="flex items-center gap-3 text-lg font-semibold text-blue-950">
             <Sparkles aria-hidden="true" className="h-6 w-6 text-blue-800" />
@@ -138,6 +144,12 @@ function ResultsDashboard(): ReactElement {
           <RotateCcw aria-hidden="true" className="h-5 w-5" />
           Start over
         </button>
+        <Link
+          to="/about"
+          className="text-center text-sm font-medium text-blue-800 underline-offset-2 hover:underline"
+        >
+          About estimates and limitations
+        </Link>
       </section>
     </main>
   );

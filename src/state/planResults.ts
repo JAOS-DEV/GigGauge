@@ -5,6 +5,7 @@ import {
   type PeriodBreakdown,
 } from '../calculations/periods';
 import { summariseExpenses } from '../calculations/expenses';
+import { splitScenarioIncome } from '../calculations/income';
 import { computeScenarioResult } from '../calculations/scenarioResult';
 import { getTaxConfig } from '../calculations/tax/taxConfig';
 import { solveRequiredGrossSalary } from '../calculations/targets/solveRequiredGross';
@@ -25,15 +26,49 @@ export type PlanResults =
       kind: 'ok';
       scenarioResult: ScenarioResult;
       required: RequiredSolve | null;
+      /**
+       * True when income was not entered and `scenarioResult` is projected from
+       * the achievable required gross/revenue solve so tax and take-home are visible.
+       */
+      projectedFromRequired: boolean;
     };
 
 function isEmployedOnly(type: WorkArrangementType): boolean {
   return type === 'employed';
 }
 
+function cloneScenario(scenario: GigGaugeScenario): GigGaugeScenario {
+  return JSON.parse(JSON.stringify(scenario)) as GigGaugeScenario;
+}
+
+/** Fill the solved required amount into the appropriate income field for display. */
+export function scenarioWithRequiredIncome(
+  scenario: GigGaugeScenario,
+  required: Extract<RequiredSolve, { achievable: true }>,
+): GigGaugeScenario {
+  const next = cloneScenario(scenario);
+  if (required.kind === 'grossSalary') {
+    next.income = {
+      ...next.income,
+      grossAnnualSalary: required.annualAmount,
+    };
+  } else {
+    next.income = {
+      ...next.income,
+      grossRevenue: required.annualAmount,
+    };
+  }
+  return next;
+}
+
 /**
  * Plan-page results: full scenario result plus an optional reverse-solved
  * required gross/revenue when the goal is take-home.
+ *
+ * When the user has not entered income but a required solve is achievable,
+ * the displayed `scenarioResult` is projected from that required amount so the
+ * financial breakdown shows Income Tax, NI and take-home for the plan that
+ * hits the goal. Entered income always wins over the projection.
  */
 export function computePlanResults(scenario: GigGaugeScenario): PlanResults {
   const config = getTaxConfig(scenario.tax.taxYear, scenario.tax.region);
@@ -41,8 +76,12 @@ export function computePlanResults(scenario: GigGaugeScenario): PlanResults {
     return { kind: 'regionUnsupported', reason: config.reason };
   }
 
-  const scenarioResult = computeScenarioResult(scenario);
+  const enteredResult = computeScenarioResult(scenario);
   const summary = summariseExpenses(scenario.expenses, scenario.work);
+  const incomeMissing = splitScenarioIncome(
+    scenario.income,
+    scenario.arrangementType,
+  ).incomeMissing;
 
   let required: RequiredSolve | null = null;
 
@@ -96,7 +135,21 @@ export function computePlanResults(scenario: GigGaugeScenario): PlanResults {
     }
   }
 
-  return { kind: 'ok', scenarioResult, required };
+  if (incomeMissing && required?.achievable) {
+    return {
+      kind: 'ok',
+      scenarioResult: computeScenarioResult(scenarioWithRequiredIncome(scenario, required)),
+      required,
+      projectedFromRequired: true,
+    };
+  }
+
+  return {
+    kind: 'ok',
+    scenarioResult: enteredResult,
+    required,
+    projectedFromRequired: false,
+  };
 }
 
 /**

@@ -76,6 +76,13 @@ function Breakdown({
       data-testid="financial-breakdown"
     >
       <h3 className="text-base font-semibold text-blue-950">Financial breakdown</h3>
+      {results.projectedFromRequired ? (
+        <p className="mt-2 text-sm text-slate-600" data-testid="breakdown-projected-note">
+          {results.required?.achievable && results.required.kind === 'grossSalary'
+            ? 'Based on the required gross salary to hit your take-home goal (you have not entered income yet).'
+            : 'Based on the required revenue to hit your take-home goal (you have not entered income yet).'}
+        </p>
+      ) : null}
       <dl className="mt-3 flex flex-col gap-2 text-base text-slate-700">
         {employmentGross > 0 || scenario.arrangementType === 'employed' ? (
           <BreakdownRow label="Gross employment income" value={employmentGross} />
